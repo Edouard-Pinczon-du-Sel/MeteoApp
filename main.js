@@ -23,6 +23,7 @@ async function getWeatherData(long, lat) {
         console.log(data);
         populateMAinInfo(data);
         handleHours(data.hourly);
+        handleDays(data.daily)
         // on enleve le loader
         loader.classList.add("fade-out");
     }
@@ -72,4 +73,59 @@ function handleHours(data) {
 
     })
 }
+
+const weekDays = [
+    'lundi',
+    'mardi',
+    'mercredi',
+    'jeudi',
+    'vendredi',
+    'samedi',
+    'dimanche',
+];
+
+// jour actuel en francais
+const currentDay = new Date().toLocaleDateString("fr-FR", {weekday: "long"});
+
+// concat permet de concatener
+const forecastDays = weekDays.slice(weekDays.indexOf(currentDay)+1).concat(
+    weekDays.slice(0, weekDays.indexOf(currentDay)+1));
+
+const daysName = document.querySelectorAll(".day-name");
+const perDayTemperature = document.querySelectorAll(".day-temp");
+
+//on formate les données et on les affiches
+function handleDays(data) {
+    forecastDays.forEach((day, index) => {
+        // première lettre en maj
+        daysName[index].textContent = forecastDays[index].charAt(0).toUpperCase()
+        // je rahoute le reste des lettres 
+        +forecastDays[index].slice(1,3);
+
+        perDayTemperature[index].textContent = `${Math.trunc(data[index + 1].temp.day)}°`
+    })
+}
+
+const tabsBtns = [...document.querySelectorAll(".tabs button")]
+const tabsContents = [...document.querySelectorAll(".forecast")]
+
+tabsBtns.forEach(btn => btn.addEventListener("click", handleTabs))
+
+function handleTabs(e) {
+    // Quand on click
+    const indexToRemove = tabsBtns.findIndex(tab => tab.classList.contains("active"))
+
+    tabsBtns[indexToRemove].classList.remove("active");
+    tabsContents[indexToRemove].classList.remove("active");
+    
+    // inverse
+    const indexToShow = tabsBtns.indexOf(e.target)
+    tabsBtns[indexToShow].classList.add("active");
+    tabsContents[indexToShow].classList.add("active");
+
+}
+
+
+
+
 
